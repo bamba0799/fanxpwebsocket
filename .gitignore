@@ -1,0 +1,35 @@
+# Dependency directories
+node_modules
+
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+
+# Lock files
+*-lock.json
+*.lock
+
+
+# Logs
+logs
+*.log
+
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+# Yarn Integrity file
+.yarn-integrity
+
+
+# MacOS
+.DS_Store

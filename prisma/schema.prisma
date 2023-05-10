@@ -1,0 +1,187 @@
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String  @id @default(uuid())
+  firstName   String  @db.VarChar(255)
+  lastName    String  @db.VarChar(100)
+  address     String  @db.VarChar(255)
+  residence   String  @db.VarChar(100)
+  email       String  @unique @db.VarChar(255)
+  password    String  @db.VarChar(255)
+  nationality String  @db.VarChar(100)
+  contact     String  @unique @db.VarChar(20)
+  team        Team[]
+  image       Image[]
+}
+
+model Team {
+  id                   String      @id @default(uuid())
+  name                 String      @unique @db.VarChar(75)
+  code                 String      @unique @db.VarChar(3)
+  flag                 String      @db.Text
+  isMemberOfCurrentCAN Boolean
+  isDiqualified        Boolean
+  user                 User[]
+  group                Group?      @relation(fields: [groupId], references: [id], onUpdate: Cascade)
+  groupId              String?
+  stage                Stage?      @relation(fields: [stageId], references: [id], onUpdate: Cascade)
+  stageId              String?
+  matchStat            MatchStat[]
+  player               Player[]
+}
+
+enum PlayerPosition {
+  goalkeeper
+  defender
+  midfielder
+  striker
+}
+
+model Player {
+  id          String         @id @default(uuid())
+  name        String         @db.VarChar(255)
+  shirtNumber Int            @db.TinyInt
+  position    PlayerPosition
+  birthday    DateTime?      @db.DateTime()
+  careerGoal  Int?           @db.TinyInt
+  club        String
+  country     Team           @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  countryId   String
+}
+
+model MatchStat {
+  goal         Int    @db.TinyInt
+  possession   Int    @db.TinyInt
+  corner       Int    @db.TinyInt
+  foul         Int    @db.TinyInt
+  shot         Int    @db.TinyInt
+  assist       Int    @db.TinyInt
+  shotOnTarget Int    @db.TinyInt
+  freekick     Int    @db.TinyInt
+  penalty      Int    @db.TinyInt
+  offside      Int    @db.TinyInt
+  redCard      Int    @db.TinyInt
+  yellowCard   Int    @db.TinyInt
+  team         Team   @relation(fields: [teamId], references: [id])
+  teamId       String
+  match        Match  @relation(fields: [matchId], references: [id])
+  matchId      String
+
+  @@unique([teamId, matchId])
+}
+
+model Stage {
+  id    String  @id @default(uuid())
+  label String  @db.VarChar(20)
+  team  Team[]
+  match Match[]
+}
+
+model Day {
+  id    String  @id @default(uuid())
+  label String
+  match Match[]
+}
+
+model Group {
+  id    String @id @default(uuid())
+  label String @db.VarChar(1)
+  team  Team[]
+}
+
+enum MatchStatus {
+  live
+  over
+  next
+}
+
+model Match {
+  id          String      @id @default(uuid())
+  date        DateTime    @db.DateTime()
+  Stage       Stage       @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  stageId     String
+  matchStatus MatchStatus
+  Stadium     Stadium     @relation(fields: [stadiumId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  stadiumId   String
+  matchStat   MatchStat[]
+  day         Day?        @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dayId       String?
+}
+
+model UsefulContact {
+  id                 String             @id @default(uuid())
+  contact            String             @unique @db.VarChar(25)
+  usefulContactOwner UsefulContactOwner @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId            String
+}
+
+model UsefulContactOwner {
+  id            String          @id @default(uuid())
+  name          String          @unique @db.VarChar(100)
+  usefulContact UsefulContact[]
+}
+
+model Stadium {
+  id       String  @id @default(uuid())
+  name     String  @unique @db.VarChar(100)
+  location String  @db.VarChar(100)
+  city     String  @db.VarChar(50)
+  capacity Int
+  match    Match[]
+  image    Image[]
+}
+
+model FanZone {
+  id       String  @id @default(uuid())
+  name     String? @db.VarChar(100)
+  location String  @db.VarChar(100)
+  image    Image[]
+}
+
+model InterestPoint {
+  id               String                @id @default(uuid())
+  name             String                @unique @db.VarChar(100)
+  location         String                @db.VarChar(100)
+  contact          String                @unique @db.VarChar(25)
+  shortDescription String                @db.VarChar(255)
+  longDescription  String                @db.Text
+  image            Image[]
+  goodDeal         GoodDeal[]
+  category         InterestPointCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId       String
+}
+
+model InterestPointCategory {
+  id            String          @id @default(uuid())
+  label         String          @db.VarChar(50)
+  interestPoint InterestPoint[]
+}
+
+model GoodDeal {
+  id              String        @id @default(uuid())
+  image           String        @db.Text
+  interestPoint   InterestPoint @relation(fields: [interestPointId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  interestPointId String
+}
+
+model Image {
+  id              String         @id @default(uuid())
+  url             String         @db.Text
+  interestPoint   InterestPoint? @relation(fields: [interestPointId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  interestPointId String?
+  fanZone         FanZone?       @relation(fields: [fanZoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fanZoneId       String?
+  stadium         Stadium?       @relation(fields: [stadiumId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stadiumId       String?
+  user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId          String?
+}
