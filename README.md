@@ -15,7 +15,7 @@ Prérequis:
 ### 1. <b>Cloner le dépôt sur votre machine</b> 🧬
 
 ```sh
-git clone https://github.com/oda-can-2024/api
+git clone https://gitlab.com/can-2023/api.git
 ```
 
 ### 2. <b>Installer toutes les dépendances</b> 📦
