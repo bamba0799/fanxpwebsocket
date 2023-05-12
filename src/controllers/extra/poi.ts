@@ -128,7 +128,7 @@ export async function postPOI(req: CustomRequest, res: Response) {
           shortDescription: req.body.shortDescription,
           longDescription: req.body.longDescription,
           categoryId: req.body.categoryId,
-          image: {
+          images: {
             create: {
               url: req.body.img,
             },
@@ -215,7 +215,7 @@ export async function updatePOI(req: CustomRequest, res: Response) {
         shortDescription: req.body.shortDescription,
         longDescription: req.body.longDescription,
         categoryId: req.body.categoryId,
-        image: {
+        images: {
           create: {
             url: req.body.img,
           },

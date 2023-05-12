@@ -204,7 +204,7 @@ export async function getAll(req: CustomRequest, res: Response) {
     const contacts = await prisma.usefulContactOwner
       .findMany({
         include: {
-          usefulContact: true,
+          usefulContacts: true,
         },
       })
       .catch((e) => {
