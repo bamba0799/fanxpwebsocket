@@ -27,7 +27,6 @@ export async function getAll(req: CustomRequest, res: Response) {
     });
   }
 }
-
 export async function getOne(req: CustomRequest, res: Response) {
   try {
     const { teamId } = req.params;

@@ -4,7 +4,6 @@ import * as teamsRoutes from "../controllers/teams/index";
 const router = express.Router();
 
 router.get("/fav/:userId", favteamsRoutes.findAll);
-
 // Teams
 router.get("/", teamsRoutes.getAll);
 router.get("/:teamId", teamsRoutes.getOne);
