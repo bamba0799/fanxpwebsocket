@@ -1,14 +1,19 @@
 import express from "express";
-import * as favteamsRoutes from "../controllers/teams/fav";
-import * as teamsRoutes from "../controllers/teams/index";
+import * as favTeamsControllers from "../controllers/teams/fav";
+import * as teamsControllers from "../controllers/teams";
+
 const router = express.Router();
 
-router.get("/fav/:userId", favteamsRoutes.findAll);
-// Teams
-router.get("/", teamsRoutes.getAll);
-router.get("/:teamId", teamsRoutes.getOne);
-router.post("/", teamsRoutes.post);
-router.delete("/:teamId", teamsRoutes.deleteTeam);
-router.put("/:teamId", teamsRoutes.updateTeam);
+// fav
+router.post("/fav", favTeamsControllers.post);
+router.get("/fav/:userId", favTeamsControllers.getAll);
+router.delete("/fav", favTeamsControllers.remove);
+
+// teams
+router.post("/", teamsControllers.post);
+router.get("/", teamsControllers.getAll);
+router.get("/:teamId", teamsControllers.getOne);
+router.put("/:teamId", teamsControllers.updateTeam);
+router.delete("/:teamId", teamsControllers.deleteTeam);
 
 export default router;
