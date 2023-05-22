@@ -27,7 +27,7 @@ WORKDIR /var/www/can-2023
 RUN npm install -g ts-node
 RUN npm install -g typescript
 RUN yarn
-RUN npx exec tsc 
+RUN yarn exec tsc 
 
 # Bundle app source
 COPY . .
@@ -35,3 +35,4 @@ RUN dir
 
 EXPOSE 8080
 CMD [ "yarn", "start" ]
+RUN dir
