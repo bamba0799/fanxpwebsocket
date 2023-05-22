@@ -17,7 +17,6 @@ RUN apt-get update; \
 
 # Create app directory
 WORKDIR /var/www/can-2023
-CMD ls
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND yarn.lock are copied
@@ -29,7 +28,8 @@ COPY yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 # Bundle app source
-COPY * .
+COPY . .
+RUN dir
 
 EXPOSE 8080
 CMD [ "yarn", "start" ]
