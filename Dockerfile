@@ -25,6 +25,8 @@ WORKDIR /var/www/can-2023
 
 # If you are building your code for production
 # RUN npm ci --omit=dev
+RUN npm install -g ts-node
+RUN npm install -g typescript
 RUN yarn install --frozen-lockfile
 
 # Bundle app source
