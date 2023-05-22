@@ -33,6 +33,7 @@ COPY . /var/www/can-2023
 RUN dir
 
 # install dependencies then build
+RUN mv .env.example .env
 RUN yarn
 RUN npx -v
 RUN yarn build
