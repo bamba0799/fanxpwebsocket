@@ -21,6 +21,6 @@
   "scripts": {
     "dev": "nodemon",
     "start": "tsc & node dist/src/index.js",
-    "build": "tsc -p"
+    "build": "tsc -p ."
   }
 }
