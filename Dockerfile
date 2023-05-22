@@ -28,6 +28,7 @@ RUN npm install -g ts-node
 RUN npm install -g typescript
 RUN yarn
 RUN npx -v
+RUN npx tsc
 
 # Bundle app source
 COPY . .
