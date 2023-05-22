@@ -16,7 +16,7 @@ RUN apt-get update; \
     rm -rf /var/lib/apt/lists/*
 
 # Create app directory
-WORKDIR /Users/davso/Desktop/code/projects/api
+WORKDIR /var/www/can-2023
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND yarn.lock are copied
