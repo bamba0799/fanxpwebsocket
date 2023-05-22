@@ -29,7 +29,7 @@ RUN npm install -g typescript
 
 
 # Bundle app source
-COPY . .
+COPY . /var/www/can-2023
 RUN dir
 
 # install dependencies then build
