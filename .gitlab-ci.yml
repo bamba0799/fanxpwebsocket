@@ -23,7 +23,7 @@ publish:
     - docker push $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
 
 deploy:
-  image: alpine:latest
+  image: node:18
   stage: deploy
   tags:
     - liverun

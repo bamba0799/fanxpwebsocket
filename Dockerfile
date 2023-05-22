@@ -20,8 +20,8 @@ WORKDIR /var/www/can-2023
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND yarn.lock are copied
-COPY package.json ./
-COPY yarn.lock ./
+# COPY package.json ./
+# COPY yarn.lock ./
 
 # If you are building your code for production
 # RUN npm ci --omit=dev
