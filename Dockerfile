@@ -37,6 +37,6 @@ RUN yarn
 RUN npx -v
 RUN yarn build
 
-EXPOSE 8080
+EXPOSE 9200
 CMD [ "yarn", "start" ]
 RUN dir
