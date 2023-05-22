@@ -26,13 +26,16 @@ WORKDIR /var/www/can-2023
 # RUN npm ci --omit=dev
 RUN npm install -g ts-node
 RUN npm install -g typescript
-RUN yarn
-RUN npx -v
-RUN yarn build
+
 
 # Bundle app source
 COPY . .
 RUN dir
+
+# install dependencies then build
+RUN yarn
+RUN npx -v
+RUN yarn build
 
 EXPOSE 8080
 CMD [ "yarn", "start" ]
