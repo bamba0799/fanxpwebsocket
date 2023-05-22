@@ -27,7 +27,7 @@ WORKDIR /var/www/can-2023
 # RUN npm ci --omit=dev
 RUN npm install -g ts-node
 RUN npm install -g typescript
-RUN yarn install --frozen-lockfile
+RUN yarn
 
 # Bundle app source
 COPY . .
