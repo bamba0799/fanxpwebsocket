@@ -1,5 +1,18 @@
 FROM node:18
 
+# run non-interactive. Suppresses prompts and just accepts defaults automatically.
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Adding some packages
+RUN apt-get update; \
+    apt-get -yq upgrade; \
+    apt-get install -y --no-install-recommends \
+    apt-utils \
+    nano; \
+    apt-get -yq autoremove; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
+
 # Create app directory
 WORKDIR /Users/davso/Desktop/code/projects/api
 
