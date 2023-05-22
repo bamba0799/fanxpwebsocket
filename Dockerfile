@@ -40,4 +40,3 @@ RUN yarn build
 
 EXPOSE 9200
 CMD [ "yarn", "start" ]
-RUN dir
