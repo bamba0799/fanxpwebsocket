@@ -27,8 +27,7 @@ WORKDIR /var/www/can-2023
 RUN npm install -g ts-node
 RUN npm install -g typescript
 RUN yarn
-RUN npm install -g npx
-RUN npx tsc 
+RUN npx -v
 
 # Bundle app source
 COPY . .
