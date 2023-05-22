@@ -1,5 +1,4 @@
 ## Dockerfile by Ersit
-
 FROM node:18
 
 # run non-interactive. Suppresses prompts and just accepts defaults automatically.
@@ -28,6 +27,8 @@ WORKDIR /var/www/can-2023
 RUN npm install -g ts-node
 RUN npm install -g typescript
 RUN yarn
+RUN npx -v
+RUN yarn build
 
 # Bundle app source
 COPY . .
@@ -35,3 +36,4 @@ RUN dir
 
 EXPOSE 8080
 CMD [ "yarn", "start" ]
+RUN dir
