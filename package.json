@@ -21,6 +21,9 @@
   "scripts": {
     "dev": "nodemon",
     "start": "tsc & node dist/src/index.js",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "db:push": "npx prisma db push",
+    "db:pull": "npx prisma db pull",
+    "db:migrate": "npx prisma migrate dev"
   }
 }
