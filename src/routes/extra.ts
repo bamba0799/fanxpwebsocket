@@ -12,7 +12,8 @@ router.put("/poi/categories/:id", poiControllers.updateCategory);
 router.delete("/poi/categories/:id", poiControllers.deleteCategory);
 router.post("/poi", poiControllers.postPOI);
 router.get("/poi", poiControllers.getAllPOI);
-router.get("/poi/:categoryId", poiControllers.getOnePOI);
+router.get("/poi/:id", poiControllers.getOnePOI);
+router.get("/poi/byCategory/:categoryId", poiControllers.getByCategory);
 router.put("/poi/:id", poiControllers.updatePOI);
 router.delete("/poi/:id", poiControllers.deletePOI);
 

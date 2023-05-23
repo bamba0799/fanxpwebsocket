@@ -6,6 +6,7 @@ export async function post(req: CustomRequest, res: Response) {
   try {
     const {
       date,
+      time,
       matchStatus,
       dayId,
       stadiumId,
@@ -16,6 +17,7 @@ export async function post(req: CustomRequest, res: Response) {
 
     if (
       !date ||
+      !time ||
       !matchStatus ||
       !dayId ||
       !stadiumId ||
@@ -31,6 +33,7 @@ export async function post(req: CustomRequest, res: Response) {
       .create({
         data: {
           date,
+          time,
           matchStatus,
           day: {
             connect: {
@@ -89,6 +92,7 @@ export async function getAll(req: CustomRequest, res: Response) {
           select: {
             id: true,
             date: true,
+            time: true,
             matchStatus: true,
             stadium: true,
             stage: true,
@@ -113,6 +117,7 @@ export async function getAll(req: CustomRequest, res: Response) {
         select: {
           id: true,
           date: true,
+          time: true,
           matchStatus: true,
           stadium: true,
           stage: true,
