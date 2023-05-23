@@ -10,17 +10,22 @@ datasource db {
 }
 
 model User {
-  id          String  @id @default(uuid())
-  firstName   String  @db.VarChar(255)
-  lastName    String  @db.VarChar(100)
-  address     String  @db.VarChar(255)
-  residence   String  @db.VarChar(100)
-  email       String  @unique @db.VarChar(255)
-  password    String  @db.VarChar(255)
-  nationality String  @db.VarChar(100)
-  contact     String  @unique @db.VarChar(20)
-  teams       Team[]
-  images      Image[]
+  id             String              @id @default(uuid())
+  firstName      String?             @db.VarChar(255)
+  lastName       String?             @db.VarChar(100)
+  address        String?             @db.VarChar(255)
+  residence      String?             @db.VarChar(100)
+  nationality    String?             @db.VarChar(100)
+  contact        String              @unique @db.VarChar(20)
+  profilePicture UserProfilePicture?
+  teams          Team[]
+  buyTicket      BuyTicket[]
+}
+
+model UserProfilePicture {
+  image  String @db.LongText
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 }
 
 model Team {
@@ -30,11 +35,11 @@ model Team {
   flag                 String      @db.Text
   isMemberOfCurrentCAN Boolean
   isDiqualified        Boolean
-  users                User[]
   group                Group?      @relation(fields: [groupId], references: [id], onUpdate: Cascade)
   groupId              String?
   stage                Stage?      @relation(fields: [stageId], references: [id], onUpdate: Cascade)
   stageId              String?
+  users                User[]
   matchStats           MatchStat[]
   players              Player[]
 }
@@ -56,33 +61,49 @@ model Player {
   club        String
   country     Team           @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   countryId   String
+  Goal        Goal[]
+}
+
+model Goal {
+  id       Int      @id @default(autoincrement())
+  minute   DateTime @db.Time()
+  player   Player   @relation(fields: [playerId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  playerId String
 }
 
 model MatchStat {
-  goal         Int?   @db.TinyInt
-  possession   Int?   @db.TinyInt
-  corner       Int?   @db.TinyInt
-  foul         Int?   @db.TinyInt
-  shot         Int?   @db.TinyInt
-  assist       Int?   @db.TinyInt
-  shotOnTarget Int?   @db.TinyInt
-  freekick     Int?   @db.TinyInt
-  penalty      Int?   @db.TinyInt
-  offside      Int?   @db.TinyInt
-  redCard      Int?   @db.TinyInt
-  yellowCard   Int?   @db.TinyInt
-  team         Team   @relation(fields: [teamId], references: [id])
+  isWinner     Boolean?
+  goal         Int?     @db.TinyInt
+  possession   Int?     @db.TinyInt
+  corner       Int?     @db.TinyInt
+  foul         Int?     @db.TinyInt
+  shot         Int?     @db.TinyInt
+  assist       Int?     @db.TinyInt
+  shotOnTarget Int?     @db.TinyInt
+  freekick     Int?     @db.TinyInt
+  penalty      Int?     @db.TinyInt
+  offside      Int?     @db.TinyInt
+  redCard      Int?     @db.TinyInt
+  yellowCard   Int?     @db.TinyInt
+  team         Team     @relation(fields: [teamId], references: [id])
   teamId       String
-  match        Match  @relation(fields: [matchId], references: [id])
+  match        Match    @relation(fields: [matchId], references: [id])
   matchId      String
 
   @@unique([teamId, matchId])
 }
 
-// TODO: add stageValue enum
+enum StageLabel {
+  group
+  sixteen
+  quarter
+  semi
+  final
+}
+
 model Stage {
-  id     String  @id @default(uuid())
-  label  String  @db.VarChar(20)
+  id     String     @id @default(uuid())
+  label  StageLabel
   teams  Team[]
   matchs Match[]
   days   Day[]
@@ -92,7 +113,7 @@ model Day {
   id      String  @id @default(uuid())
   label   String
   matchs  Match[]
-  Stage   Stage   @relation(fields: [stageId], references: [id])
+  stage   Stage   @relation(fields: [stageId], references: [id])
   stageId String
 }
 
@@ -108,18 +129,19 @@ enum MatchStatus {
   next
 }
 
-// TODO: make dayId required & add time attribute
 model Match {
   id          String      @id @default(uuid())
   date        DateTime    @db.Date
+  time        DateTime    @db.Time
   stage       Stage       @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: Cascade)
   stageId     String
   matchStatus MatchStatus
   stadium     Stadium     @relation(fields: [stadiumId], references: [id], onDelete: NoAction, onUpdate: Cascade)
   stadiumId   String
   matchStats  MatchStat[]
-  day         Day?        @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  dayId       String?
+  day         Day         @relation(fields: [dayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dayId       String
+  buyTicket   BuyTicket[]
 }
 
 model UsefulContact {
@@ -136,20 +158,25 @@ model UsefulContactOwner {
 }
 
 model Stadium {
-  id       String  @id @default(uuid())
-  name     String  @unique @db.VarChar(100)
-  location String  @db.VarChar(100)
-  city     String  @db.VarChar(50)
+  id       String         @id @default(uuid())
+  name     String         @unique @db.VarChar(100)
+  location String         @db.VarChar(100)
+  city     String         @db.VarChar(50)
   capacity Int
   matchs   Match[]
-  images   Image[]
+  images   StadiumImage[]
 }
 
-model FanZone {
-  id       String  @id @default(uuid())
-  name     String? @db.VarChar(100)
-  location String  @db.VarChar(100)
-  images   Image[]
+model StadiumImage {
+  id        String  @id @default(uuid())
+  url       String  @db.LongText
+  stadium   Stadium @relation(fields: [stadiumId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stadiumId String
+}
+
+enum InterestPointStatus {
+  vip
+  regular
 }
 
 model InterestPoint {
@@ -159,10 +186,18 @@ model InterestPoint {
   contact          String                @unique @db.VarChar(25)
   shortDescription String                @db.VarChar(255)
   longDescription  String                @db.Text
-  images           Image[]
+  status           InterestPointStatus   @default(regular)
   goodDeals        GoodDeal[]
+  images           InterestPointImage[]
   category         InterestPointCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   categoryId       String
+}
+
+model InterestPointImage {
+  id              String        @id @default(uuid())
+  url             String        @db.LongText
+  interestPoint   InterestPoint @relation(fields: [interestPointId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  interestPointId String
 }
 
 model InterestPointCategory {
@@ -172,21 +207,35 @@ model InterestPointCategory {
 }
 
 model GoodDeal {
-  id              String        @id @default(uuid())
-  image           String        @db.Text
-  interestPoint   InterestPoint @relation(fields: [interestPointId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  interestPointId String
-}
-
-model Image {
   id              String         @id @default(uuid())
-  url             String         @db.Text
+  image           String         @db.LongText
   interestPoint   InterestPoint? @relation(fields: [interestPointId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   interestPointId String?
-  fanZone         FanZone?       @relation(fields: [fanZoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  fanZoneId       String?
-  stadium         Stadium?       @relation(fields: [stadiumId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  stadiumId       String?
-  user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId          String?
+}
+
+enum TicketCategory {
+  regular
+  vip
+}
+
+model Ticket {
+  id        String         @id @default(uuid())
+  matricule String         @unique @db.VarChar(50)
+  price     Int
+  category  TicketCategory
+  buyTicket BuyTicket[]
+}
+
+model BuyTicket {
+  quantity   Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  match      Match    @relation(fields: [matchId], references: [id])
+  matchId    String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId   String
+  date       DateTime @default(now())
+  bonusPoint Int      @default(0)
+
+  @@unique([userId, matchId, ticketId])
 }
