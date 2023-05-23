@@ -1,9 +1,8 @@
 import { Response } from "express";
-import { InterestPoint, InterestPointCategory } from "@prisma/client";
+import { InterestPointCategory, InterestPointStatus } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import { CustomRequest } from "../types";
 
-// category
 export async function postCategory(
   req: CustomRequest<InterestPointCategory>,
   res: Response
@@ -110,27 +109,74 @@ export async function deleteCategory(req: CustomRequest, res: Response) {
 
 export async function postPOI(req: CustomRequest, res: Response) {
   try {
-    const areParamsDefined = Object.values(req.body).some((value) => {
-      return value ? true : false;
-    });
+    const {
+      name,
+      location,
+      contact,
+      shortDescription,
+      longDescription,
+      status,
+      categoryId,
+      img,
+    } = req.body;
 
-    if (!areParamsDefined) {
+    if (
+      !name ||
+      !location ||
+      !contact ||
+      !status ||
+      !shortDescription ||
+      !longDescription ||
+      !categoryId
+    ) {
       res.status(400);
       throw Error("Missing parameters");
     }
 
-    const poi = await prisma.interestPoint
+    let poi;
+
+    if (img) {
+      poi = await prisma.interestPoint
+        .create({
+          data: {
+            name,
+            location,
+            contact,
+            shortDescription,
+            longDescription,
+            status,
+            category: {
+              connect: {
+                id: categoryId,
+              },
+            },
+            images: {
+              create: {
+                url: img,
+              },
+            },
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
+
+      return res.status(201).json(poi);
+    }
+
+    poi = await prisma.interestPoint
       .create({
         data: {
-          name: req.body.name,
-          location: req.body.location,
-          contact: req.body.contact,
-          shortDescription: req.body.shortDescription,
-          longDescription: req.body.longDescription,
-          categoryId: req.body.categoryId,
-          images: {
-            create: {
-              url: req.body.img,
+          name,
+          location,
+          contact,
+          shortDescription,
+          longDescription,
+          status,
+          category: {
+            connect: {
+              id: categoryId,
             },
           },
         },
@@ -149,15 +195,113 @@ export async function postPOI(req: CustomRequest, res: Response) {
   }
 }
 
-export async function getAllPOI(
-  req: CustomRequest<InterestPoint>,
-  res: Response
-) {
+export async function getAllPOI(req: CustomRequest, res: Response) {
   try {
-    const poi = await prisma.interestPoint.findMany().catch((e) => {
-      res.status(400);
-      throw e;
+    const { limit, status } = req.query;
+    let poi;
+
+    if (status) {
+      if (limit) {
+        poi = await prisma.interestPointCategory
+          .findMany({
+            include: {
+              interestPoints: {
+                where: {
+                  status: <InterestPointStatus>status,
+                },
+                include: {
+                  images: true,
+                },
+                orderBy: {
+                  status: "asc",
+                },
+                take: parseInt(limit as string),
+              },
+            },
+          })
+          .catch((e) => {
+            res.status(400);
+            throw e;
+          });
+
+        return res.json(poi);
+      }
+
+      poi = await prisma.interestPointCategory
+        .findMany({
+          include: {
+            interestPoints: {
+              where: {
+                status: <InterestPointStatus>status,
+              },
+              include: {
+                images: true,
+              },
+              orderBy: {
+                status: "asc",
+              },
+            },
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
+
+      return res.json(poi);
+    }
+
+    poi = await prisma.interestPointCategory
+      .findMany({
+        include: {
+          interestPoints: {
+            include: {
+              images: true,
+            },
+            orderBy: {
+              status: "asc",
+            },
+          },
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
+    res.json(poi);
+  } catch (e: any) {
+    res.json({
+      name: e.name ?? "Error",
+      message: e.message as string,
     });
+  }
+}
+
+export async function getByCategory(req: CustomRequest, res: Response) {
+  try {
+    const { categoryId } = req.params;
+
+    const poi = await prisma.interestPointCategory
+      .findMany({
+        where: {
+          id: categoryId,
+        },
+        include: {
+          interestPoints: {
+            include: {
+              images: true,
+            },
+            orderBy: {
+              status: "asc",
+            },
+          },
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
+
     res.json(poi);
   } catch (e: any) {
     res.json({
@@ -169,12 +313,15 @@ export async function getAllPOI(
 
 export async function getOnePOI(req: CustomRequest, res: Response) {
   try {
-    const { categoryId } = req.params;
+    const { id } = req.params;
 
     const poi = await prisma.interestPoint
-      .findMany({
+      .findUnique({
         where: {
-          categoryId,
+          id,
+        },
+        include: {
+          images: true,
         },
       })
       .catch((e) => {
