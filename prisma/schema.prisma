@@ -158,13 +158,14 @@ model UsefulContactOwner {
 }
 
 model Stadium {
-  id       String         @id @default(uuid())
-  name     String         @unique @db.VarChar(100)
-  location String         @db.VarChar(100)
-  city     String         @db.VarChar(50)
-  capacity Int
-  matchs   Match[]
-  images   StadiumImage[]
+  id          String         @id @default(uuid())
+  name        String         @unique @db.VarChar(100)
+  location    String         @db.VarChar(100)
+  city        String         @db.VarChar(50)
+  capacity    Int
+  description String?        @db.Text
+  matchs      Match[]
+  images      StadiumImage[]
 }
 
 model StadiumImage {
