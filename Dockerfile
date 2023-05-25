@@ -1,10 +1,13 @@
 ## Dockerfile by Ersit
 FROM node:18
 
-# run non-interactive. Suppresses prompts and just accepts defaults automatically.
+
+# Run non-interactive mode. 
+# Suppresses prompts and just accepts defaults automatically.
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Adding some packages
+
+# Add some packages
 RUN apt-get update; \
     apt-get -yq upgrade; \
     apt-get install -y --no-install-recommends \
@@ -17,26 +20,19 @@ RUN apt-get update; \
 # Create app directory
 WORKDIR /var/www/can-2023
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND yarn.lock are copied
-# COPY package.json ./
-# COPY yarn.lock ./
-
-# If you are building your code for production
-# RUN npm ci --omit=dev
-RUN npm install -g ts-node
-RUN npm install -g typescript
-
 
 # Bundle app source
 COPY . /var/www/can-2023
 RUN dir
 
-# install dependencies then build
-RUN mv .env.example .env
-RUN yarn
-RUN npx -v
-RUN yarn build
 
+# Install dependencies
+RUN yarn
+
+
+# Set the port
 EXPOSE 9200
+
+
+# Build and run the app
 CMD [ "yarn", "start" ]
