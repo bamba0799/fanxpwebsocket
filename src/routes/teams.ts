@@ -11,9 +11,10 @@ router.delete("/fav", favTeamsControllers.remove);
 
 // teams
 router.post("/", teamsControllers.post);
+router.post("/add-to-group", teamsControllers.addTeamToAGroup);
 router.get("/", teamsControllers.getAll);
 router.get("/:teamId", teamsControllers.getOne);
-router.put("/:teamId", teamsControllers.updateTeam);
-router.delete("/:teamId", teamsControllers.deleteTeam);
+router.put("/:teamId", teamsControllers.update);
+router.delete("/:teamId", teamsControllers.remove);
 
 export default router;
