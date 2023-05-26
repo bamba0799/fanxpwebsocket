@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { Group } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { CustomRequest } from "./types";
 
@@ -34,6 +33,9 @@ export async function getAll(req: CustomRequest, res: Response) {
             },
           },
         },
+        orderBy: {
+          label: "asc",
+        },
       })
       .catch((e) => {
         res.status(400);
@@ -49,9 +51,9 @@ export async function getAll(req: CustomRequest, res: Response) {
 }
 
 export async function getOne(req: CustomRequest, res: Response) {
-  try {
-    const { groupId } = req.params;
+  const { groupId } = req.params;
 
+  try {
     const oneGroupTeam = await prisma.group
       .findUnique({
         where: {
