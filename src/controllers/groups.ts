@@ -1,9 +1,9 @@
 import { Response } from "express";
-import { Group, Stage, Team } from "@prisma/client";
+import { Group } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { CustomRequest } from "./types";
 
-export async function findAll(req: CustomRequest, res: Response) {
+export async function getAll(req: CustomRequest, res: Response) {
   try {
     const groupTeam = await prisma.group
       .findMany({
@@ -47,7 +47,8 @@ export async function findAll(req: CustomRequest, res: Response) {
     });
   }
 }
-export async function findOne(req: CustomRequest, res: Response) {
+
+export async function getOne(req: CustomRequest, res: Response) {
   try {
     const { groupId } = req.params;
 
@@ -77,6 +78,31 @@ export async function findOne(req: CustomRequest, res: Response) {
   }
 }
 
-/* 
+export async function post(req: CustomRequest, res: Response) {
+  const { label } = req.body;
 
-*/
+  if (!label) {
+    res.status(400);
+    throw Error("Missing parameters");
+  }
+
+  try {
+    const group = await prisma.group
+      .create({
+        data: {
+          label,
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
+
+    res.json(group);
+  } catch (e: any) {
+    res.json({
+      name: e.name ?? "Error",
+      message: e.message as string,
+    });
+  }
+}

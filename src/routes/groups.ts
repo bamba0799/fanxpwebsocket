@@ -1,9 +1,10 @@
 import express from "express";
-import * as groupsRoutes from "../controllers/groups";
+import * as groupsControllers from "../controllers/groups";
 
 const router = express.Router();
 
-router.get("/", groupsRoutes.findAll);
-router.get("/:groupId", groupsRoutes.findOne);
+router.get("/", groupsControllers.getAll);
+router.get("/:groupId", groupsControllers.getOne);
+router.post("/", groupsControllers.post);
 
 export default router;
