@@ -5,14 +5,30 @@ import { CustomRequest } from "../types";
 
 export async function getAll(req: CustomRequest, res: Response) {
   try {
-    const team = await prisma.team
+    const { groupId } = req.query;
+    let team;
+
+    if (groupId) {
+      team = await prisma.team.findMany({
+        where: {
+          group:
+            groupId === "0"
+              ? null
+              : {
+                  id: groupId as string,
+                },
+        },
+      });
+      return res.json(team);
+    }
+
+    team = await prisma.team
       .findMany({
         include: {
           group: true,
           stage: true,
           matchStats: true,
           players: true,
-          // users: true,
         },
       })
       .catch((e) => {
@@ -27,6 +43,7 @@ export async function getAll(req: CustomRequest, res: Response) {
     });
   }
 }
+
 export async function getOne(req: CustomRequest, res: Response) {
   try {
     const { teamId } = req.params;
@@ -57,14 +74,6 @@ export async function getOne(req: CustomRequest, res: Response) {
 
 export async function post(req: CustomRequest, res: Response) {
   try {
-    const areParamsDefined = Object.values(req.body).some((value) => {
-      return value ? true : false;
-    });
-
-    if (!areParamsDefined) {
-      res.status(400);
-      throw Error("Missing parameters");
-    }
     const {
       name,
       code,
@@ -74,17 +83,60 @@ export async function post(req: CustomRequest, res: Response) {
       groupId,
       stageId,
     } = req.body;
+    let team;
 
-    const teams = await prisma.team
+    if (!name || !code || !flag || isMemberOfCurrentCAN == null) {
+      res.status(400);
+      throw Error("Missing parameters");
+    }
+
+    if (
+      isMemberOfCurrentCAN === true &&
+      (isDiqualified == null || !stageId || !groupId)
+    ) {
+      res.status(400);
+      throw Error(
+        "Must provide additional parameters when `isMemberOfCurrentCAN` is set to `true`"
+      );
+    }
+
+    if (isMemberOfCurrentCAN === true) {
+      team = await prisma.team
+        .create({
+          data: {
+            name,
+            code,
+            flag,
+            isMemberOfCurrentCAN, // true
+            isDiqualified,
+            group: {
+              connect: {
+                id: groupId,
+              },
+            },
+            stage: {
+              connect: {
+                id: stageId,
+              },
+            },
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
+
+      return res.json(team);
+    }
+
+    team = await prisma.team
       .create({
         data: {
           name,
           code,
           flag,
-          isMemberOfCurrentCAN,
-          isDiqualified,
-          groupId,
-          stageId,
+          isMemberOfCurrentCAN, // false
+          isDiqualified: false,
         },
       })
       .catch((e) => {
@@ -92,7 +144,7 @@ export async function post(req: CustomRequest, res: Response) {
         throw e;
       });
 
-    return res.status(201).json(teams);
+    res.json(team);
   } catch (e: any) {
     res.json({
       name: e.name ?? "Error",
@@ -101,7 +153,62 @@ export async function post(req: CustomRequest, res: Response) {
   }
 }
 
-export async function deleteTeam(req: CustomRequest, res: Response) {
+export async function addTeamToAGroup(req: CustomRequest, res: Response) {
+  const { teamId, groupId } = req.body;
+
+  if (!teamId || !groupId) {
+    res.status(400);
+    throw Error("Missing parameters");
+  }
+
+  try {
+    // get group stage ID
+    const groupStageIdArray = await prisma.stage.findMany({
+      select: {
+        id: true,
+      },
+      where: {
+        label: {
+          equals: "group",
+        },
+      },
+    });
+
+    const team = await prisma.team
+      .update({
+        data: {
+          isMemberOfCurrentCAN: true,
+          isDiqualified: false,
+          group: {
+            connect: {
+              id: groupId,
+            },
+          },
+          stage: {
+            connect: {
+              id: groupStageIdArray[0].id,
+            },
+          },
+        },
+        where: {
+          id: teamId,
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
+
+    res.json(team);
+  } catch (e: any) {
+    res.json({
+      name: e.name ?? "Error",
+      message: e.message,
+    });
+  }
+}
+
+export async function remove(req: CustomRequest, res: Response) {
   try {
     const { teamId } = req.params;
 
@@ -124,32 +231,59 @@ export async function deleteTeam(req: CustomRequest, res: Response) {
   }
 }
 
-export async function updateTeam(req: CustomRequest, res: Response) {
+export async function update(req: CustomRequest, res: Response) {
+  const {
+    name,
+    code,
+    flag,
+    groupId,
+    stageId,
+    isMemberOfCurrentCAN,
+    isDiqualified,
+  } = req.body;
   const { teamId } = req.params;
+
+  if (
+    !name ||
+    !code ||
+    !flag ||
+    !groupId ||
+    !stageId ||
+    isMemberOfCurrentCAN == null ||
+    isDiqualified == null
+  ) {
+    res.status(400);
+    throw Error("Missing parameters");
+  }
+
   try {
-    const areParamsDefined = Object.values(req.body).some((value) => {
-      return value ? true : false;
-    });
-
-    if (!areParamsDefined) {
-      res.status(400);
-      throw Error("Missing parameters");
-    }
-
-    const team = await prisma.team.update({
-      where: {
-        id: teamId,
-      },
-      data: {
-        name: req.body.name,
-        code: req.body.code,
-        flag: req.body.flag,
-        groupId: req.body.groupId,
-        stageId: req.body.stageId,
-        isMemberOfCurrentCAN: req.body.isMemberOfCurrentCAN,
-        isDiqualified: req.body.isDiqualified,
-      },
-    });
+    const team = await prisma.team
+      .update({
+        where: {
+          id: teamId,
+        },
+        data: {
+          name,
+          code,
+          flag,
+          isMemberOfCurrentCAN,
+          isDiqualified,
+          group: {
+            connect: {
+              id: groupId,
+            },
+          },
+          stage: {
+            connect: {
+              id: stageId,
+            },
+          },
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
 
     res.status(201).json(team);
   } catch (e: any) {
