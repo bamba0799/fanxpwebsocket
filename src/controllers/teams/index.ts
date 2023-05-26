@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { Team } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import { CustomRequest } from "../types";
 
@@ -9,16 +8,19 @@ export async function getAll(req: CustomRequest, res: Response) {
     let team;
 
     if (groupId) {
-      team = await prisma.team.findMany({
-        where: {
-          group:
-            groupId === "0"
-              ? null
-              : {
-                  id: groupId as string,
-                },
-        },
-      });
+      team = await prisma.team
+        .findMany({
+          where: {
+            group: groupId === "0" ? null : { id: groupId as string },
+          },
+          orderBy: {
+            name: "asc",
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
       return res.json(team);
     }
 
@@ -29,6 +31,9 @@ export async function getAll(req: CustomRequest, res: Response) {
           stage: true,
           matchStats: true,
           players: true,
+        },
+        orderBy: {
+          name: "asc",
         },
       })
       .catch((e) => {

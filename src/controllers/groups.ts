@@ -31,6 +31,9 @@ export async function getAll(req: CustomRequest, res: Response) {
                 },
               },
             },
+            orderBy: {
+              name: "asc",
+            },
           },
         },
         orderBy: {
@@ -63,6 +66,9 @@ export async function getOne(req: CustomRequest, res: Response) {
           teams: {
             include: {
               matchStats: true,
+            },
+            orderBy: {
+              name: "asc",
             },
           },
         },
