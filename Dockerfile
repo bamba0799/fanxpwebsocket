@@ -21,7 +21,7 @@ COPY . .
 
 RUN npm run build && dir
 
-COPY .env ./dist
+COPY ./.env ./dist
 
 WORKDIR ./dist
 
