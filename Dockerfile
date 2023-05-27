@@ -13,14 +13,17 @@ RUN apt-get update; \
 
 WORKDIR /var/www/can-2023
 
-COPY . /var/www/can-2023
+COPY package*.json .
 
-ENV PORT=9200
-ENV DATABASE_URL="mysql://can2023:can2023Digital@217.182.139.100:3306/can2023"
+RUN npm install
 
-RUN yarn \ 
-    && yarn build \
-    && dir
+COPY . .
+
+RUN npm run build 
+
+COPY .env ./dist
+
+WORKDIR ./dist
 
 EXPOSE 9200
 
