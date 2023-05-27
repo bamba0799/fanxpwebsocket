@@ -7,13 +7,9 @@ COPY . .
 
 # Install app deps
 RUN yarn \
-    && yarn build \
-    && dir
+    && yarn build
 
 WORKDIR /var/www/can-2023/dist
-
-# Check new workdir
-RUN dir
 
 EXPOSE 9200
 
