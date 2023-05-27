@@ -15,7 +15,7 @@ WORKDIR /var/www/can-2023
 
 RUN yarn && yarn build
 
-COPY . .
+COPY . /var/www/can-2023
 
 ENV PORT=9200
 ENV DATABASE_URL="mysql://can2023:can2023Digital@217.182.139.100:3306/can2023"
