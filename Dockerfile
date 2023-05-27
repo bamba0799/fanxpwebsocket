@@ -5,7 +5,7 @@ WORKDIR /var/www/can-2023
 # Bundle app source
 COPY . .
 
-# Install app deps
+# Install deps & build app
 RUN yarn \
     && yarn build
 
