@@ -3,7 +3,8 @@
     "lib": ["es2020"],
     "module": "CommonJS",
     "target": "es2020",
-    "outDir": "dist",
+    "outDir": "./dist",
+    "rootDir": ".",
 
     "strict": true,
     "esModuleInterop": true,
