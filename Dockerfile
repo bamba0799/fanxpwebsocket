@@ -19,7 +19,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build 
+RUN npm run build && dir
 
 COPY .env ./dist
 
@@ -27,4 +27,4 @@ WORKDIR ./dist
 
 EXPOSE 9200
 
-CMD [ "yarn", "start" ]
+CMD node src/index.js
