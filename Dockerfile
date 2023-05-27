@@ -1,13 +1,16 @@
-## Dockerfile by Ersit
 FROM node:18-alpine
 
-
-# Create app directory
+# app dir
 WORKDIR /var/www/can-2023
 
 
-# Bundle app source
 COPY . /var/www/can-2023
+
+
+# Install `yarn` globally
+RUN npm --version \ 
+    npm i -g yarn \
+    yarn --version
 
 
 RUN yarn \
