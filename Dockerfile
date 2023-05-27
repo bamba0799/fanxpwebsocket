@@ -25,7 +25,7 @@ WORKDIR /var/www/can-2023
 COPY . /var/www/can-2023
 
 
-RUN yarn install \
+RUN yarn \
     yarn build \
     dir
 
