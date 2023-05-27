@@ -14,6 +14,7 @@ export async function getAll(req: CustomRequest, res: Response) {
               },
             },
             include: {
+              group: true,
               matchStats: {
                 where: {
                   match: {
@@ -65,6 +66,7 @@ export async function getOne(req: CustomRequest, res: Response) {
         include: {
           teams: {
             include: {
+              group: true,
               matchStats: true,
             },
             orderBy: {
