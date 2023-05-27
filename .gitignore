@@ -3,9 +3,8 @@ node_modules
 dist/
 
 
-# env var
+# Environment variables
 .env
-.env.*
 
 
 # Logs
