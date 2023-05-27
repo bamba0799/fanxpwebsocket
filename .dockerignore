@@ -1,4 +1,12 @@
 node_modules
-*-debug.log
 README.md
 
+# Logs
+*-debug.log
+
+# Editor
+.vscode
+.prettierrc
+.editorconfig
+
+nodemon.json

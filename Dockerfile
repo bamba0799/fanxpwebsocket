@@ -1,5 +1,5 @@
 ## Dockerfile by Ersit
-FROM node:18
+FROM node:18-alpine
 
 
 # Run non-interactive mode. 
@@ -25,11 +25,9 @@ WORKDIR /var/www/can-2023
 COPY . /var/www/can-2023
 
 
-RUN dir \
-  && yarn install \
-  && yarn build \
-  && rm -rf node_modules \
-  && yarn install --production
+RUN yarn install \
+    yarn build \
+    dir
 
 
 EXPOSE 9200
