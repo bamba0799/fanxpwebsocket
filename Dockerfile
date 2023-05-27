@@ -13,11 +13,17 @@ RUN apt-get update; \
 
 WORKDIR /var/www/can-2023
 
-COPY . /var/www/can-2023
+COPY package.json .
+COPY yarn.lock .
 
 RUN yarn \
     && yarn build \
     && dir
+
+COPY . .
+
+ENV PORT=9200
+ENV DATABASE_URL="mysql://can2023:can2023Digital@217.182.139.100:3306/can2023"
 
 EXPOSE 9200
 
