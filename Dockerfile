@@ -9,8 +9,6 @@ COPY . .
 RUN yarn \
     && yarn build
 
-WORKDIR /var/www/can-2023/dist
-
 EXPOSE 9200
 
-CMD node src/index.js
+CMD [ "yarn", "start" ]
