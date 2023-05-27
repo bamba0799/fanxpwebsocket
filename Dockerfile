@@ -23,16 +23,16 @@ WORKDIR /var/www/can-2023
 
 # Bundle app source
 COPY . /var/www/can-2023
-RUN dir
 
 
-# Install dependencies
-RUN yarn
+RUN dir \
+  && yarn install \
+  && yarn build \
+  && rm -rf node_modules \
+  && yarn install --production
 
 
-# Set the port
 EXPOSE 9200
 
 
-# Build and run the app
 CMD [ "yarn", "start" ]
