@@ -1,29 +1,19 @@
-FROM node:18
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update; \
-    apt-get -yq upgrade; \
-    apt-get install -y --no-install-recommends \
-    apt-utils \
-    nano; \
-    apt-get -yq autoremove; \
-    apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
+FROM node:18-alpine
 
 WORKDIR /var/www/can-2023
 
-COPY package*.json .
-
-RUN npm install
-
+# Bundle app source
 COPY . .
 
-RUN npm run build && dir
+# Install app deps
+RUN yarn \
+    && yarn build \
+    && dir
 
-COPY ./.env ./dist
+WORKDIR /var/www/can-2023/dist
 
-WORKDIR ./dist
+# Check new workdir
+RUN dir
 
 EXPOSE 9200
 
