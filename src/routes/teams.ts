@@ -15,6 +15,7 @@ router.post("/add-to-group", teamsControllers.addTeamToAGroup);
 router.get("/", teamsControllers.getAll);
 router.get("/:teamId", teamsControllers.getOne);
 router.put("/:teamId", teamsControllers.update);
+router.put("/unassign-to-group/:teamId", teamsControllers.unassignToAGroup);
 router.delete("/:teamId", teamsControllers.remove);
 
 export default router;
