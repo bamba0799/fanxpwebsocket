@@ -4,14 +4,32 @@ import { CustomRequest } from "../types";
 
 export async function getAll(req: CustomRequest, res: Response) {
   try {
-    const { groupId } = req.query;
+    const { group, current } = req.query;
     let team;
 
-    if (groupId) {
+    if (current) {
       team = await prisma.team
         .findMany({
           where: {
-            group: groupId === "0" ? null : { id: groupId as string },
+            isMemberOfCurrentCAN: current === "1" ? true : false,
+          },
+          orderBy: {
+            name: "asc",
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
+      return res.json(team);
+    }
+
+    // get group teams
+    if (group) {
+      team = await prisma.team
+        .findMany({
+          where: {
+            group: group === "0" ? null : { label: group as string },
           },
           orderBy: {
             name: "asc",
