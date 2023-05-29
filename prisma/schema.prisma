@@ -54,6 +54,7 @@ enum PlayerPosition {
 model Player {
   id          String         @id @default(uuid())
   name        String         @db.VarChar(255)
+  image       String         @db.LongText
   shirtNumber Int            @db.TinyInt
   position    PlayerPosition
   birthday    DateTime?      @db.DateTime()
