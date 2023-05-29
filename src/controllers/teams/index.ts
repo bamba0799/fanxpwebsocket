@@ -13,6 +13,14 @@ export async function getAll(req: CustomRequest, res: Response) {
           where: {
             isMemberOfCurrentCAN: current === "1" ? true : false,
           },
+          include:
+            userId === "1" // include UUID
+              ? {
+                  users: {
+                    select: { id: true },
+                  },
+                }
+              : null,
           orderBy: {
             name: "asc",
           },
@@ -30,26 +38,6 @@ export async function getAll(req: CustomRequest, res: Response) {
         .findMany({
           where: {
             group: group === "0" ? null : { label: group as string },
-          },
-          orderBy: {
-            name: "asc",
-          },
-        })
-        .catch((e) => {
-          res.status(400);
-          throw e;
-        });
-      return res.json(team);
-    }
-
-    // include UUID
-    if (userId === ("1" || "true")) {
-      team = await prisma.team
-        .findMany({
-          include: {
-            users: {
-              select: { id: true },
-            },
           },
           orderBy: {
             name: "asc",
