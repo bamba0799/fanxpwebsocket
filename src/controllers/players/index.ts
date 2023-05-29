@@ -4,6 +4,7 @@ import { CustomRequest } from "../types";
 
 export async function getAll(req: CustomRequest, res: Response) {
   const { idCountry } = req.query;
+
   try {
     const player = await prisma.player
       .findMany({
@@ -15,6 +16,7 @@ export async function getAll(req: CustomRequest, res: Response) {
         res.status(400);
         throw e;
       });
+
     res.json(player);
   } catch (e: any) {
     res.json({
@@ -25,18 +27,20 @@ export async function getAll(req: CustomRequest, res: Response) {
 }
 
 export async function getOne(req: CustomRequest, res: Response) {
+  const { playerId } = req.params;
+
   try {
-    const { PlayerId } = req.params;
     const player = await prisma.player
       .findUnique({
         where: {
-          id: PlayerId,
+          id: playerId,
         },
       })
       .catch((e: any) => {
         res.status(400);
         throw e;
       });
+
     res.json(player);
   } catch (e: any) {
     res.json({
@@ -47,17 +51,18 @@ export async function getOne(req: CustomRequest, res: Response) {
 }
 
 export async function post(req: CustomRequest, res: Response) {
-  try {
-    const {
-      name,
-      shirtNumber,
-      position,
-      birthday,
-      careerGoal,
-      club,
-      countryId,
-    } = req.body;
+  const {
+    name,
+    shirtNumber,
+    position,
+    birthday,
+    careerGoal,
+    club,
+    image,
+    countryId,
+  } = req.body;
 
+  try {
     if (
       !name ||
       !shirtNumber ||
@@ -65,7 +70,8 @@ export async function post(req: CustomRequest, res: Response) {
       !birthday ||
       !careerGoal ||
       !club ||
-      countryId
+      !image ||
+      !countryId
     ) {
       res.status(400);
       throw Error("Missing parameters");
@@ -80,7 +86,12 @@ export async function post(req: CustomRequest, res: Response) {
           birthday,
           careerGoal,
           club,
-          countryId,
+          image,
+          country: {
+            connect: {
+              id: countryId,
+            },
+          },
         },
       })
       .catch((e: any) => {
@@ -88,7 +99,7 @@ export async function post(req: CustomRequest, res: Response) {
         throw e;
       });
 
-    return res.status(201).json(players);
+    res.status(201).json(players);
   } catch (e: any) {
     res.json({
       name: e.name ?? "Error",
@@ -97,21 +108,22 @@ export async function post(req: CustomRequest, res: Response) {
   }
 }
 
-export async function deletePlayer(req: CustomRequest, res: Response) {
-  try {
-    const { PlayerId } = req.params;
+export async function remove(req: CustomRequest, res: Response) {
+  const { playerId } = req.params;
 
+  try {
     await prisma.player
       .delete({
         where: {
-          id: PlayerId,
+          id: playerId,
         },
       })
       .catch((e: any) => {
         res.status(400);
         throw e;
       });
-    res.json("player delete succesfull");
+
+    res.sendStatus(204);
   } catch (e: any) {
     res.json({
       name: e.name ?? "Error",
@@ -120,19 +132,20 @@ export async function deletePlayer(req: CustomRequest, res: Response) {
   }
 }
 
-export async function updatePlayer(req: CustomRequest, res: Response) {
-  const { PlayerId } = req.params;
-  try {
-    const {
-      name,
-      shirtNumber,
-      position,
-      birthday,
-      careerGoal,
-      club,
-      countryId,
-    } = req.body;
+export async function update(req: CustomRequest, res: Response) {
+  const {
+    name,
+    shirtNumber,
+    position,
+    birthday,
+    careerGoal,
+    club,
+    image,
+    countryId,
+  } = req.body;
+  const { playerId } = req.params;
 
+  try {
     if (
       !name ||
       !shirtNumber ||
@@ -140,6 +153,7 @@ export async function updatePlayer(req: CustomRequest, res: Response) {
       !birthday ||
       !careerGoal ||
       !club ||
+      !image ||
       countryId
     ) {
       res.status(400);
@@ -148,7 +162,7 @@ export async function updatePlayer(req: CustomRequest, res: Response) {
 
     const player = await prisma.player.update({
       where: {
-        id: PlayerId,
+        id: playerId,
       },
       data: {
         name,
@@ -157,6 +171,7 @@ export async function updatePlayer(req: CustomRequest, res: Response) {
         birthday,
         careerGoal,
         club,
+        image,
         countryId,
       },
     });

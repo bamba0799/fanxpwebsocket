@@ -62,7 +62,7 @@ model Player {
   club        String
   country     Team           @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   countryId   String
-  Goal        Goal[]
+  goals       Goal[]
 }
 
 model Goal {
