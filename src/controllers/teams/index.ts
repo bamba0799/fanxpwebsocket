@@ -4,7 +4,7 @@ import { CustomRequest } from "../types";
 
 export async function getAll(req: CustomRequest, res: Response) {
   try {
-    const { group, current } = req.query;
+    const { group, current, userId } = req.query;
     let team;
 
     if (current) {
@@ -30,6 +30,26 @@ export async function getAll(req: CustomRequest, res: Response) {
         .findMany({
           where: {
             group: group === "0" ? null : { label: group as string },
+          },
+          orderBy: {
+            name: "asc",
+          },
+        })
+        .catch((e) => {
+          res.status(400);
+          throw e;
+        });
+      return res.json(team);
+    }
+
+    // include UUID
+    if (userId === ("1" || "true")) {
+      team = await prisma.team
+        .findMany({
+          include: {
+            users: {
+              select: { id: true },
+            },
           },
           orderBy: {
             name: "asc",
