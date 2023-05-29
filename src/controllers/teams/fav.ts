@@ -52,15 +52,20 @@ export async function remove(req: CustomRequest, res: Response) {
 
 export async function post(req: CustomRequest, res: Response) {
   try {
-    const { teamId, userId } = req.body;
+    const { team, userId } = req.body;
 
-    if (!teamId || !userId) {
+    if (!team.teamId || !userId || team.isMemberOfCurrentCAN == null) {
       res.status(400);
       throw Error("Missing parameters");
     }
 
+    if (team.isMemberOfCurrentCAN === false) {
+      res.status(401);
+      throw Error("Cannot link a user to a non-participating team");
+    }
+
     await prisma.$executeRaw`INSERT INTO _TeamToUser (A, B) 
-      VALUES (${teamId}, ${userId})`.catch((e) => {
+      VALUES (${team.teamId}, ${userId})`.catch((e) => {
       res.status(400);
       throw e;
     });
