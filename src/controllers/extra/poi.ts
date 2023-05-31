@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { InterestPointCategory, InterestPointStatus } from "@prisma/client";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../lib/prisma";
 import { CustomRequest } from "../types";
 
 export async function postCategory(
