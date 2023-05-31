@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { UsefulContactOwner } from "@prisma/client";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../lib/prisma";
 import { CustomRequest } from "../types";
 
 export async function updateOwner(

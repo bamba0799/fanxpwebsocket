@@ -8,6 +8,7 @@ import groupsRoutes from "./routes/groups";
 import extraRoutes from "./routes/extra";
 import matchsRoutes from "./routes/matchs";
 import playersRoutes from "./routes/players";
+import authRoutes from "./routes/auth";
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use("/api/groups", groupsRoutes);
 app.use("/api/extra", extraRoutes);
 app.use("/api/matchs", matchsRoutes);
 app.use("/api/players", playersRoutes);
+app.use("/api/auth", authRoutes);
+
 app.listen(parseInt(PORT as string), () =>
   console.log(`Running on http://localhost:${PORT}`)
 );

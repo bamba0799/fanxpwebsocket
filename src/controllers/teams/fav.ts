@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { Team } from "@prisma/client";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../lib/prisma";
 import { CustomRequest } from "../types";
 
 export async function getAll(req: CustomRequest, res: Response) {
@@ -52,20 +52,20 @@ export async function remove(req: CustomRequest, res: Response) {
 
 export async function post(req: CustomRequest, res: Response) {
   try {
-    const { team, userId } = req.body;
+    const { teamId, userId, isMemberOfCurrentCAN } = req.body;
 
-    if (!team.teamId || !userId || team.isMemberOfCurrentCAN == null) {
+    if (!teamId || !userId || isMemberOfCurrentCAN == null) {
       res.status(400);
       throw Error("Missing parameters");
     }
 
-    if (team.isMemberOfCurrentCAN === false) {
+    if (isMemberOfCurrentCAN === false) {
       res.status(401);
       throw Error("Cannot link a user to a non-participating team");
     }
 
     await prisma.$executeRaw`INSERT INTO _TeamToUser (A, B) 
-      VALUES (${team.teamId}, ${userId})`.catch((e) => {
+      VALUES (${teamId}, ${userId})`.catch((e) => {
       res.status(400);
       throw e;
     });
