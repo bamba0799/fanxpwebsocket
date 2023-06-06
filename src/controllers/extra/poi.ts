@@ -201,32 +201,6 @@ export async function getAllPOI(req: CustomRequest, res: Response) {
     let poi;
 
     if (status) {
-      if (limit) {
-        poi = await prisma.interestPointCategory
-          .findMany({
-            include: {
-              interestPoints: {
-                where: {
-                  status: <InterestPointStatus>status,
-                },
-                include: {
-                  images: true,
-                },
-                orderBy: {
-                  status: "asc",
-                },
-                take: parseInt(limit as string),
-              },
-            },
-          })
-          .catch((e) => {
-            res.status(400);
-            throw e;
-          });
-
-        return res.json(poi);
-      }
-
       poi = await prisma.interestPointCategory
         .findMany({
           include: {
@@ -240,6 +214,7 @@ export async function getAllPOI(req: CustomRequest, res: Response) {
               orderBy: {
                 status: "asc",
               },
+              take: limit ? parseInt(limit as string) : undefined,
             },
           },
         })
@@ -261,6 +236,7 @@ export async function getAllPOI(req: CustomRequest, res: Response) {
             orderBy: {
               status: "asc",
             },
+            take: limit ? parseInt(limit as string) : undefined,
           },
         },
       })
@@ -268,6 +244,7 @@ export async function getAllPOI(req: CustomRequest, res: Response) {
         res.status(400);
         throw e;
       });
+
     res.json(poi);
   } catch (e: any) {
     res.json({
