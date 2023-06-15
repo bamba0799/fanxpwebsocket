@@ -1,8 +1,7 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
-import { CustomRequest } from "../types";
 
-export async function post(req: CustomRequest, res: Response) {
+export async function post(req: Request, res: Response) {
   try {
     const {
       date,
@@ -76,7 +75,7 @@ export async function post(req: CustomRequest, res: Response) {
   }
 }
 
-export async function getAll(req: CustomRequest, res: Response) {
+export async function getAll(req: Request, res: Response) {
   try {
     const { date } = req.query;
     let matchs;
@@ -143,7 +142,45 @@ export async function getAll(req: CustomRequest, res: Response) {
   }
 }
 
-export async function remove(req: CustomRequest, res: Response) {
+export async function getOne(req: Request, res: Response) {
+  const { matchId } = req.params;
+
+  try {
+    const match = await prisma.match
+      .findUnique({
+        where: {
+          id: matchId,
+        },
+        select: {
+          id: true,
+          date: true,
+          time: true,
+          matchStatus: true,
+          stadium: true,
+          stage: true,
+          day: true,
+          matchStats: {
+            include: {
+              team: true,
+            },
+          },
+        },
+      })
+      .catch((e) => {
+        res.status(400);
+        throw e;
+      });
+
+    res.json(match);
+  } catch (e: any) {
+    res.json({
+      name: e.name ?? "Error",
+      message: e.message as string,
+    });
+  }
+}
+
+export async function remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
