@@ -5,6 +5,7 @@ import {
   generateAccessToken,
   generateOTP,
   generateRefreshToken,
+  verifyToken,
 } from "../utils/auth";
 import { redis } from "../lib/redis";
 import { sendSMS } from "../utils/sms";
@@ -84,6 +85,10 @@ export async function verifyOTP(req: Request, res: Response) {
 
     const user = <User>await prisma.user.findUnique({
       where: { contact },
+      select: {
+        id: true,
+        contact: true,
+      },
     });
 
     // generate tokens
@@ -92,6 +97,36 @@ export async function verifyOTP(req: Request, res: Response) {
 
     // delete OTP
     await redis.del(OTP);
+
+    res.status(201).json({
+      accessToken,
+      refreshToken,
+    });
+  } catch (e: any) {
+    res.json({
+      name: e.name ?? "Error",
+      message: e.message as string,
+    });
+  }
+}
+
+export async function refreshToken(req: Request, res: Response) {
+  const { token } = req.body;
+
+  try {
+    if (!token) {
+      res.status(403);
+      throw new Error("You first need to be authenticated.");
+    }
+
+    const user = await verifyToken({ token, type: "refresh" }).catch((e) => {
+      res.status(401);
+      throw e;
+    });
+
+    // generate tokens
+    const accessToken = generateAccessToken(<User>user);
+    const refreshToken = generateRefreshToken(<User>user);
 
     res.status(201).json({
       accessToken,
