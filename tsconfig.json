@@ -10,6 +10,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+
+    // Customize types folders
+    "typeRoots": ["@types", "./node_modules/@types"]
   }
 }
