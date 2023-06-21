@@ -1,6 +1,12 @@
 import { config } from "dotenv";
+import { resolve } from "path";
 
-config();
+const ENV_FILE_PATH =
+  process.env.NODE_ENV === "production"
+    ? resolve(__dirname, "../../.env.prod")
+    : resolve(__dirname, "../../.env.dev");
+
+config({ path: ENV_FILE_PATH });
 
 // API
 export const PORT = process.env.PORT;

@@ -25,7 +25,7 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "start": "node dist/src/index.js",
+    "start": "cp .env.prod dist/ && NODE_ENV=production node dist/src/index.js",
     "build": "tsc -p .",
     "db:push": "npx prisma db push",
     "db:pull": "npx prisma db pull",
