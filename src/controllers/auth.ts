@@ -10,7 +10,7 @@ import {
 import { redis } from "../lib/redis";
 import { sendSMS } from "../utils/sms";
 
-export async function signInOrSignUp(req: Request, res: Response) {
+export async function getAuth(req: Request, res: Response) {
   const { contact } = req.body;
 
   try {
@@ -28,7 +28,7 @@ export async function signInOrSignUp(req: Request, res: Response) {
 
     // register
     if (!isUser) {
-      const user = await prisma.user
+      await prisma.user
         .create({
           data: {
             contact,
@@ -41,8 +41,6 @@ export async function signInOrSignUp(req: Request, res: Response) {
           res.status(400);
           throw e;
         });
-
-      return res.status(201).json(user);
     }
 
     // generate OTP
@@ -58,7 +56,7 @@ export async function signInOrSignUp(req: Request, res: Response) {
       throw e;
     });
 
-    res.sendStatus(201);
+    res.status(201).json("OK");
   } catch (e: any) {
     res.json({
       name: e.name ?? "Error",
