@@ -17,7 +17,7 @@ export function generateAccessToken<T extends { id: string; contact: string }>(
       contact: payload.contact,
     },
     <string>constants.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "30m" }
   );
 }
 
