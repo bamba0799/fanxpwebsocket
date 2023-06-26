@@ -34,7 +34,7 @@ export async function sendSMS(props: SendSMSProps) {
           address: `tel:+225${props.phone}`,
           senderAddress: `tel:+225${senderPhone}`,
           outboundSMSTextMessage: {
-            message: `Votre code de connexion à l'application FanXP est: ${props.OTP}`,
+            message: `Votre code de connexion à l'application FanXp est: ${props.OTP}`,
           },
         },
       },
