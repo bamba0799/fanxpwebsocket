@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://moussa:vzvokMui1wYqpbWH@localhost:8887/fanXP"
 }
 
 model User {
@@ -20,6 +20,9 @@ model User {
   profilePicture UserProfilePicture?
   teams          Team[]
   buyTicket      BuyTicket[]
+  responses      UserResponse[]
+  eventPointUser EventPointUser[]
+   
 }
 
 model UserProfilePicture {
@@ -74,7 +77,7 @@ model Goal {
 
 model MatchStat {
   isWinner     Boolean?
-  goal         Int?     @db.TinyInt
+  goal         Int?     @db.TinyInt 
   possession   Int?     @db.TinyInt
   corner       Int?     @db.TinyInt
   foul         Int?     @db.TinyInt
@@ -167,6 +170,7 @@ model Stadium {
   description String?        @db.Text
   matchs      Match[]
   images      StadiumImage[]
+  seatOfStadium SeatOfStadium[]
 }
 
 model StadiumImage {
@@ -215,21 +219,18 @@ model GoodDeal {
   interestPointId String?
 }
 
-enum TicketCategory {
-  regular
-  vip
-}
 
 model Ticket {
   id        String         @id @default(uuid())
   matricule String         @unique @db.VarChar(50)
   price     Int
-  category  TicketCategory
   buyTicket BuyTicket[]
+
 }
 
+
+
 model BuyTicket {
-  quantity   Int
   user       User     @relation(fields: [userId], references: [id])
   userId     String
   match      Match    @relation(fields: [matchId], references: [id])
@@ -238,6 +239,77 @@ model BuyTicket {
   ticketId   String
   date       DateTime @default(now())
   bonusPoint Int      @default(0)
-
   @@unique([userId, matchId, ticketId])
 }
+
+model SeatOfStadium {
+  id              String      @id @default(uuid())
+  seatNumber       Int         
+  rowNumber        Int
+  stadium          Stadium @relation(fields: [stadiumId], references: [id])
+  stadiumId        String
+
+}
+
+model UserResponse {
+
+  user         User  @relation(fields: [userId], references: [id])
+  userId       String
+
+  response     Response  @relation(fields: [responseId], references: [id])
+  responseId   String
+
+
+  @@unique([userId, responseId])
+
+}
+
+model Response {
+  id         String     @id @default(uuid())
+  label      String     @db.VarChar(50)
+  users      UserResponse[]
+
+  quiz       Quiz     @relation(fields: [quizId], references: [id])
+  quizId     String
+
+
+}
+
+model Quiz {
+  id       String  @id @default(uuid())
+  label    String  @db.VarChar(50)
+  trueResponse  String  @db.VarChar(50)
+  responses    Response[]   
+}
+
+
+model EventPointUser {
+userId               String 
+user                 User           @relation(fields: [userId], references: [id])
+
+eventId              String         
+event                Event           @relation(fields: [eventId], references: [id])
+
+pointId              String       
+point                Point            @relation(fields: [pointId], references: [id])
+
+date        DateTime @default(now()) 
+@@unique([userId, eventId, pointId])
+}
+
+model Event {
+  id        String        @id @default(uuid())
+  label     String        @db.VarChar(50)
+  eventPointUser  EventPointUser[]
+}
+
+model Point {
+  id       String     @id @default(uuid())
+  value    Int 
+  eventPointUser  EventPointUser[]
+}
+
+
+
+
+  // date        DateTime @default(now())  
