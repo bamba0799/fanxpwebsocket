@@ -3,8 +3,8 @@ import { resolve } from "path";
 
 const ENV_FILE_PATH =
   process.env.NODE_ENV === "production"
-    ? resolve(__dirname, "../../.env.prod")
-    : resolve(__dirname, "../../.env.dev");
+    ? resolve(process.cwd(), ".env.prod")
+    : resolve(process.cwd(), ".env.dev");
 
 config({ path: ENV_FILE_PATH });
 

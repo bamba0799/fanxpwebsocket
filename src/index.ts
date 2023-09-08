@@ -2,66 +2,96 @@ import express = require("express");
 import cors = require("cors");
 import { PORT } from "./config/constants";
 
-// routes
-import teamsRoutes from "./routes/teams";
-import groupsRoutes from "./routes/groups";
-import extraRoutes from "./routes/extra";
-import matchsRoutes from "./routes/matchs";
-import playersRoutes from "./routes/players";
-import authRoutes from "./routes/auth";
-import stadiumsRoutes from "./routes/stadiums";
-import userRoutes from "./routes/user";
-import ticketRoutes from "./routes/ticket"
-import quizRoutes from "./routes/quiz"
-//
-import http from 'http'
-import {Server} from "socket.io"
 
+import http from "http";
+import { Server } from "socket.io";
+import { emit } from "process";
 
 
 const app = express();
 //
-const server = http.createServer(app)
-
-
+const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/teams", teamsRoutes);
-app.use("/api/groups", groupsRoutes);
-app.use("/api/extra", extraRoutes);
-app.use("/api/matchs", matchsRoutes);
-app.use("/api/players", playersRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/stadiums", stadiumsRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/ticket", ticketRoutes);
-app.use("/api/quiz", quizRoutes);
+
 
 app.listen(parseInt(PORT as string), () =>
   console.log(`Running on http://localhost:${PORT}`)
 );
 
-
 //
-const io = new Server(server, {
-  cors:{
-    origin:'http://localhost:5173',
-    methods: ['GET', 'POST'],   
-  }
-})
 
-io.on("connection", (socket) => {
-  console.log(`user connected: ${socket.id}`);
-  socket.on("send_message", (data: any) => {
-    console.log(data)
-    socket.broadcast.emit("receive_message", data)
-  })
-  
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
-server.listen(3500, () => {
-  console.log('server is running ')
-})
+let waitTime = 5
+console.log(waitTime)
+let questionDuration: number = 10
+
+let currentQuiz: any //il sera initialiser currentQuiz.duration
+let numberOfquestion: number
+let rankOfQuestion: number
+io.on("connection", (socket) => {
+
+  if (currentQuiz && waitTime == 5) {
+    currentQuiz.question.duration = waitTime
+    currentQuiz.question.duration = questionDuration
+  }
+  else if (currentQuiz && waitTime != 5) {
+    currentQuiz.question.duration = questionDuration
+    currentQuiz.waitTime = waitTime
+    currentQuiz.numberOfquestion = numberOfquestion
+    currentQuiz.rankOfQuestion = rankOfQuestion
+    console.log("welcommme", currentQuiz)
+    socket.emit("welcome", currentQuiz)
+  }
+  else {
+    socket.on("send_message", (data: any) => {
+      waitTime = 5
+      questionDuration = 10
+      numberOfquestion = data.numberOfquestion
+      rankOfQuestion = data.rankOfQuestion
+      console.log('le rank', rankOfQuestion)
+      const wait = { waitTime: waitTime }
+      const conct = Object.assign({}, data, wait)
+      socket.broadcast.emit("receive_message", conct)
+      currentQuiz = conct
+      console.log("le data", data)
+
+      let countdownIntervalWaitTime = setInterval(() => {
+        if (waitTime > 0) {
+          waitTime--;
+          console.log("decrement", waitTime);
+        } else {
+          clearInterval(countdownIntervalWaitTime);
+        }
+      }, 1000);
+      let countdownIntervalResponseTime = setInterval(() => {
+        if (waitTime == 0 && questionDuration > 0) {
+          questionDuration--
+          console.log("decrement quiz duration", questionDuration)
+        }
+        else if (waitTime == 0 && questionDuration == 0) {
+          clearInterval(countdownIntervalResponseTime)
+        }
+      }, 1000)
+
+    }
+
+    );
+  }
+  socket.on('disconnect', () => {
+    console.log("utilisateur déconnecté")
+  })
+});
+
+server.listen(7100, () => {
+  console.log("server is running ");
+});
